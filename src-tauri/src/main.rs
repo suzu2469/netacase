@@ -25,7 +25,7 @@ struct Settings {
     pub token: Token,
 }
 
-const TOKEN_FILE: &str = "../token.json";
+const TOKEN_FILE: &str = "../.config/token.json";
 
 #[tauri::command]
 fn set_token(token: Token) -> Result<(), String> {
@@ -36,7 +36,19 @@ fn set_token(token: Token) -> Result<(), String> {
 
 #[tauri::command]
 fn get_token() -> Result<Token, String> {
-    let token_json = fs::read(TOKEN_FILE).map_err(|e| e.to_string())?;
+    let token_json = match fs::read(TOKEN_FILE) {
+        Ok(token_json) => token_json,
+        Err(_) => {
+            let empty_token = Token {
+                github: "".to_string(),
+                atlassian: "".to_string(),
+                linear: "".to_string(),
+            };
+            let empty_token_string = serde_json::to_string(&empty_token).map_err(|e| e.to_string())?;
+            fs::write(TOKEN_FILE, empty_token_string).map_err(|e| e.to_string())?;
+            fs::read(TOKEN_FILE).map_err(|e| e.to_string())?
+        }
+    };
     serde_json::from_slice(&token_json).map_err(|e| e.to_string())?
 }
 
