@@ -1,18 +1,11 @@
 import * as React from 'react'
 import type { NextPage } from 'next'
 import { invoke } from '@tauri-apps/api/tauri'
-import {
-    Text,
-    Container,
-    Row,
-    Input,
-    Grid,
-    Col,
-    Button,
-} from '@nextui-org/react'
+import { Text, Container, Row, Input, Col, Button } from '@nextui-org/react'
 import { useRouter } from 'next/router'
-import { tokenContext } from '../context/token'
 import { useForm } from 'react-hook-form'
+import { useQuery } from 'react-query'
+import type { GetTokenResponse } from '../types/GetTokenResponse'
 
 type FormData = {
     github: string
@@ -22,13 +15,13 @@ type FormData = {
 
 const Index: NextPage = () => {
     const router = useRouter()
-    const token = React.useContext(tokenContext)
+    const query = useQuery('token', () => invoke<GetTokenResponse>('get_token'))
 
     const form = useForm<FormData>({
         defaultValues: {
-            github: token.github,
-            atlassian: token.atlassian,
-            linear: token.linear,
+            github: '',
+            atlassian: '',
+            linear: '',
         },
     })
 
@@ -50,8 +43,8 @@ const Index: NextPage = () => {
     )
 
     React.useEffect(() => {
-        form.reset(token)
-    }, [token])
+        form.reset(query.data)
+    }, [query.data])
 
     return (
         <form onSubmit={form.handleSubmit(clickSubmit)}>

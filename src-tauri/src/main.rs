@@ -1,6 +1,6 @@
 #![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
+all(not(debug_assertions), target_os = "windows"),
+windows_subsystem = "windows"
 )]
 
 use std::fs;
@@ -17,12 +17,6 @@ struct Token {
     pub github: String,
     pub atlassian: String,
     pub linear: String,
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-struct Settings {
-    pub initialized: bool,
-    pub token: Token,
 }
 
 const TOKEN_FILE: &str = "../.config/token.json";
@@ -49,12 +43,41 @@ fn get_token() -> Result<Token, String> {
             fs::read(TOKEN_FILE).map_err(|e| e.to_string())?
         }
     };
-    serde_json::from_slice(&token_json).map_err(|e| e.to_string())?
+    serde_json::from_slice(&token_json).map_err(|e| e.to_string())
+}
+
+const CONNECTION_FILE: &str = "../.config/connection.json";
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct Connection {
+    pub github: Vec<GithubRepositories>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct GithubRepositories {
+    pub owner: String,
+    pub repo: String,
+}
+
+#[tauri::command]
+fn get_connection() -> Result<Connection, String> {
+    let connection_json = match fs::read(CONNECTION_FILE) {
+        Ok(con) => con,
+        Err(_) => {
+            let empty_connection = Connection {
+                github: vec![]
+            };
+            let empty_connection_string = serde_json::to_string(&empty_connection).map_err(|e| e.to_string())?;
+            fs::write(CONNECTION_FILE, empty_connection_string).map_err(|e| e.to_string())?;
+            fs::read(CONNECTION_FILE).map_err(|e| e.to_string())?
+        }
+    };
+    serde_json::from_slice(&connection_json).map_err(|e| e.to_string())
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, set_token, get_token])
+        .invoke_handler(tauri::generate_handler![greet, set_token, get_token, get_connection])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
