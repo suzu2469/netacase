@@ -12,7 +12,7 @@ fn greet(name: &str) -> String {
 }
 
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 struct Token {
     pub github: String,
     pub atlassian: String,
