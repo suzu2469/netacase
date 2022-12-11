@@ -6,6 +6,9 @@ import { invoke } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/shell'
 import { GetConnectionResponse } from '../../types/GetConnectionResponse'
 import { Octokit } from 'octokit'
+import flow from 'lodash/fp/flow'
+import flatMap from 'lodash/fp/flatMap'
+import orderBy from 'lodash/fp/orderBy'
 
 type Props = {}
 const GithubPRTable: React.FC<Props> = (props) => {
@@ -43,13 +46,11 @@ const TableRepositories: React.FC<{
         })) ?? [],
     )
 
-    console.log(repoQueries)
-
     const pullRequests = React.useMemo(() => {
-        return repoQueries
-            .flatMap((q) => (q.isLoading ? [] : q.data.data.items))
-            .sort((a, b) => (a.draft > b.draft ? 1 : -1))
-            .sort((a, b) => (a.state === 'closed' ? 1 : -1))
+        return flow(
+            flatMap((q) => (q.isLoading ? [] : q.data.data.items)),
+            orderBy(['draft', (pr) => pr.state === 'closed'], ['desc', 'asc']),
+        )(repoQueries)
     }, [repoQueries])
 
     return (
@@ -69,7 +70,7 @@ const TableRepositories: React.FC<{
                     <Table.Row key={pr.id}>
                         <Table.Cell css={{ maxWidth: '200px' }}>
                             <Link
-                                onPress={(e) =>
+                                onClick={(e) =>
                                     open(
                                         `https://github.com/${
                                             pr.url.match(
@@ -83,7 +84,7 @@ const TableRepositories: React.FC<{
                             </Link>
                         </Table.Cell>
                         <Table.Cell css={{ maxWidth: '256px' }}>
-                            <Link onPress={() => open(pr.html_url)}>
+                            <Link onClick={() => open(pr.html_url)}>
                                 {pr.title}
                             </Link>
                         </Table.Cell>
@@ -97,7 +98,7 @@ const TableRepositories: React.FC<{
     )
 }
 
-const stateToBadge = (state: string, draft: bolean) => {
+const stateToBadge = (state: string, draft: boolean) => {
     if (draft) return <Badge color="default">Draft</Badge>
     switch (state) {
         case 'open':

@@ -1,17 +1,17 @@
 import { NextUIProvider } from '@nextui-org/react'
-import { ApolloProvider } from '../context/apollo'
 import { OctokitProvider } from '../context/octokit'
 import { ReactQueryProvider } from '../context/reactQuery'
+import { LinearProvider } from '../context/linear'
 
 function MyApp({ Component, pageProps }) {
     return (
         <NextUIProvider>
             <ReactQueryProvider>
-                <ApolloProvider>
-                    <OctokitProvider>
+                <OctokitProvider>
+                    <LinearProvider>
                         <Component {...pageProps} />
-                    </OctokitProvider>
-                </ApolloProvider>
+                    </LinearProvider>
+                </OctokitProvider>
             </ReactQueryProvider>
         </NextUIProvider>
     )
