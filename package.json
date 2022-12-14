@@ -8,8 +8,13 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/server": "^11.10.0",
     "@linear/sdk": "^1.22.0",
-    "@nextui-org/react": "1.0.0-beta.10",
+    "@mantine/core": "^5.9.4",
+    "@mantine/hooks": "^5.9.4",
+    "@mantine/next": "^5.9.4",
+    "@tabler/icons": "^1.117.0",
     "@tauri-apps/api": "^1.1.0",
     "date-fns": "^2.29.3",
     "lodash": "^4.17.21",

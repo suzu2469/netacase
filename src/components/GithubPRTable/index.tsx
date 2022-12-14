@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Table, Link, Badge } from '@nextui-org/react'
+import { Table, Text, Badge } from '@mantine/core'
 import { OctokitContext } from '../../context/octokit'
 import { QueriesOptions, useQueries, useQuery } from 'react-query'
 import { invoke } from '@tauri-apps/api/tauri'
@@ -54,22 +54,23 @@ const TableRepositories: React.FC<{
     }, [repoQueries])
 
     return (
-        <Table
-            containerCss={{
-                minWidth: '100%',
-                height: 'auto',
-            }}
-        >
-            <Table.Header>
-                <Table.Column>Repository</Table.Column>
-                <Table.Column>PR</Table.Column>
-                <Table.Column>Status</Table.Column>
-            </Table.Header>
-            <Table.Body>
+        <Table>
+            <thead>
+                <tr>
+                    <th>Repository</th>
+                    <th>PR</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
                 {pullRequests.map((pr) => (
-                    <Table.Row key={pr.id}>
-                        <Table.Cell css={{ maxWidth: '200px' }}>
-                            <Link
+                    <tr key={pr.id}>
+                        <td>
+                            <Text
+                                style={{
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                }}
                                 onClick={(e) =>
                                     open(
                                         `https://github.com/${
@@ -81,30 +82,34 @@ const TableRepositories: React.FC<{
                                 }
                             >
                                 {pr.url.match(/repos\/(.*)\/issues/)[1]}
-                            </Link>
-                        </Table.Cell>
-                        <Table.Cell css={{ maxWidth: '256px' }}>
-                            <Link onClick={() => open(pr.html_url)}>
+                            </Text>
+                        </td>
+                        <td>
+                            <Text
+                                style={{
+                                    textDecoration: 'underline',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => open(pr.html_url)}
+                            >
                                 {pr.title}
-                            </Link>
-                        </Table.Cell>
-                        <Table.Cell>
-                            {stateToBadge(pr.state, pr.draft)}
-                        </Table.Cell>
-                    </Table.Row>
+                            </Text>
+                        </td>
+                        <td>{stateToBadge(pr.state, pr.draft)}</td>
+                    </tr>
                 ))}
-            </Table.Body>
+            </tbody>
         </Table>
     )
 }
 
 const stateToBadge = (state: string, draft: boolean) => {
-    if (draft) return <Badge color="default">Draft</Badge>
+    if (draft) return <Badge color="gray">Draft</Badge>
     switch (state) {
         case 'open':
-            return <Badge color="success">Open</Badge>
+            return <Badge>Open</Badge>
         case 'closed':
-            return <Badge color="secondary">Closed</Badge>
+            return <Badge color="violet">Closed</Badge>
     }
 }
 
