@@ -13,13 +13,28 @@ import {
     Text,
     Loader,
 } from '@mantine/core'
-import { IconPlus, IconTrash, IconSearch, IconLoader } from '@tabler/icons'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import {
+    IconPlus,
+    IconTrash,
+    IconSearch,
+    IconLoader,
+    IconCheck,
+    IconDownload,
+} from '@tabler/icons'
+import {
+    Controller,
+    useFieldArray,
+    useForm,
+    UseFormReturn,
+} from 'react-hook-form'
 import * as React from 'react'
 import { OctokitContext } from '../context/octokit'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import { useDebouncedState } from '@mantine/hooks'
 import { LinearContext } from '../context/linear'
+import { invoke } from '@tauri-apps/api/tauri'
+import { GetMembersResponse } from '../types/GetMembersResponse'
+import Link from 'next/link'
 
 type GithubSelect = SelectItem & {
     image: string
@@ -34,10 +49,21 @@ type FormData = {
     rows: FormRow[]
 }
 const Members: NextPage = () => {
-    const octokit = React.useContext(OctokitContext)
     const linear = React.useContext(LinearContext)
 
-    const [debouncedSearch, setDebouncedSearch] = useDebouncedState('', 500)
+    const membersQuery = useQuery('members', () =>
+        invoke<GetMembersResponse>('get_members'),
+    )
+    const membersMutation = useMutation('members', (data: FormData) =>
+        invoke('set_members', {
+            memberSetting: {
+                members: data.rows.map((m) => ({
+                    githubId: m.github,
+                    linearId: m.linear,
+                })),
+            } as GetMembersResponse,
+        }),
+    )
 
     const form = useForm<FormData>({
         defaultValues: {
@@ -60,27 +86,11 @@ const Members: NextPage = () => {
         [fieldArray],
     )
 
-    const githubMembersQuery = useQuery(
-        `github/members/${debouncedSearch}`,
-        () => octokit?.rest.search.users({ q: debouncedSearch, per_page: 10 }),
-        { enabled: !!octokit && debouncedSearch !== '' },
-    )
-
     const linearMembersQuery = useQuery(
         `linear/members`,
         () => linear?.users(),
         { enabled: !!linear },
     )
-
-    const githubSelect = React.useMemo((): GithubSelect[] => {
-        return (
-            githubMembersQuery.data?.data.items.map((m) => ({
-                label: m.login,
-                value: m.login,
-                image: m.avatar_url,
-            })) ?? []
-        )
-    }, [githubMembersQuery.data])
 
     const linearSelect = React.useMemo((): SelectItem[] => {
         return (
@@ -91,9 +101,43 @@ const Members: NextPage = () => {
         )
     }, [linearMembersQuery.data])
 
+    const submit = React.useCallback(() => {
+        membersMutation.mutate(form.getValues())
+    }, [])
+
+    React.useEffect(() => {
+        if (membersQuery.isLoading) return
+        form.setValue(
+            'rows',
+            membersQuery.data?.members.map<FormRow>((m) => ({
+                github: m.githubId,
+                linear: m.linearId,
+                githubSearch: m.githubId,
+            })) ?? [],
+        )
+    }, [membersQuery.data])
+
     return (
         <Container mt="48px">
-            <Title order={1}>Members</Title>
+            <Link href="/app">{'< TOP'}</Link>
+            <Group>
+                <Title order={1}>Members</Title>
+                <Button
+                    onClick={submit}
+                    leftIcon={
+                        membersMutation.isLoading ? (
+                            <Loader size={14} />
+                        ) : membersMutation.isSuccess ? (
+                            <IconCheck />
+                        ) : (
+                            <IconDownload />
+                        )
+                    }
+                    color={membersMutation.isSuccess ? 'green' : 'blue'}
+                >
+                    保存
+                </Button>
+            </Group>
             <Table>
                 <thead>
                     <tr>
@@ -106,43 +150,7 @@ const Members: NextPage = () => {
                     {fieldArray.fields.map((row, index) => (
                         <tr key={row.id}>
                             <td>
-                                <Controller
-                                    name={`rows.${index}.githubSearch`}
-                                    control={form.control}
-                                    render={({ field: searchField }) => (
-                                        <Controller
-                                            name={`rows.${index}.github`}
-                                            control={form.control}
-                                            render={({ field }) => (
-                                                <Select
-                                                    searchable
-                                                    ref={field.ref}
-                                                    itemComponent={SelectItem}
-                                                    data={githubSelect}
-                                                    value={field.value}
-                                                    onBlur={field.onBlur}
-                                                    onChange={field.onChange}
-                                                    searchValue={
-                                                        searchField.value
-                                                    }
-                                                    onSearchChange={(s) => {
-                                                        searchField.onChange(s)
-                                                        setDebouncedSearch(s)
-                                                    }}
-                                                    icon={
-                                                        githubMembersQuery.isLoading ? (
-                                                            <Loader size={14} />
-                                                        ) : (
-                                                            <IconSearch
-                                                                size={14}
-                                                            />
-                                                        )
-                                                    }
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                />
+                                <GithubUserSelect index={index} form={form} />
                             </td>
                             <td>
                                 <Controller
@@ -176,6 +184,67 @@ const Members: NextPage = () => {
                 追加
             </Button>
         </Container>
+    )
+}
+
+const GithubUserSelect: React.FC<{
+    index: number
+    form: UseFormReturn<FormData>
+}> = ({ index, form }) => {
+    const octokit = React.useContext(OctokitContext)
+
+    const [debouncedSearch, setDebouncedSearch] = useDebouncedState('', 500)
+
+    const githubMembersQuery = useQuery(
+        `github/members/${debouncedSearch}`,
+        () => octokit?.rest.search.users({ q: debouncedSearch, per_page: 10 }),
+        { enabled: !!octokit && debouncedSearch !== '' },
+    )
+
+    const githubSelect = React.useMemo((): GithubSelect[] => {
+        return (
+            githubMembersQuery.data?.data.items.map((m) => ({
+                label: m.login,
+                value: m.login,
+                image: m.avatar_url,
+            })) ?? []
+        )
+    }, [githubMembersQuery.data])
+
+    return (
+        <Controller
+            name={`rows.${index}.githubSearch`}
+            control={form.control}
+            render={({ field: searchField }) => (
+                <Controller
+                    name={`rows.${index}.github`}
+                    control={form.control}
+                    render={({ field }) => (
+                        <Select
+                            searchable
+                            ref={field.ref}
+                            itemComponent={SelectItem}
+                            data={githubSelect}
+                            value={field.value}
+                            onBlur={field.onBlur}
+                            onChange={field.onChange}
+                            searchValue={searchField.value}
+                            onSearchChange={(s) => {
+                                searchField.onChange(s)
+                                setDebouncedSearch(s)
+                            }}
+                            icon={
+                                githubMembersQuery.isLoading ? (
+                                    <Loader size={14} />
+                                ) : (
+                                    <IconSearch size={14} />
+                                )
+                            }
+                        />
+                    )}
+                />
+            )}
+        />
     )
 }
 
