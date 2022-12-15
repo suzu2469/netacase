@@ -27,6 +27,7 @@ type GithubSelect = SelectItem & {
 
 type FormRow = {
     github: string
+    githubSearch: string
     linear: string
 }
 type FormData = {
@@ -36,8 +37,7 @@ const Members: NextPage = () => {
     const octokit = React.useContext(OctokitContext)
     const linear = React.useContext(LinearContext)
 
-    const [search, setSearch] = React.useState('')
-    const [debouncedSearch, setDebouncedSearch] = useDebouncedState(search, 500)
+    const [debouncedSearch, setDebouncedSearch] = useDebouncedState('', 500)
 
     const form = useForm<FormData>({
         defaultValues: {
@@ -50,7 +50,7 @@ const Members: NextPage = () => {
     })
 
     const appendRow = React.useCallback(() => {
-        fieldArray.append({ github: '', linear: '' })
+        fieldArray.append({ github: '', githubSearch: '', linear: '' })
     }, [fieldArray])
 
     const removeRow = React.useCallback(
@@ -63,7 +63,7 @@ const Members: NextPage = () => {
     const githubMembersQuery = useQuery(
         `github/members/${debouncedSearch}`,
         () => octokit?.rest.search.users({ q: debouncedSearch, per_page: 10 }),
-        { enabled: !!octokit || debouncedSearch === '' },
+        { enabled: !!octokit && debouncedSearch !== '' },
     )
 
     const linearMembersQuery = useQuery(
@@ -84,7 +84,7 @@ const Members: NextPage = () => {
 
     const linearSelect = React.useMemo((): SelectItem[] => {
         return (
-            linearMembersQuery.data.nodes.map((m) => ({
+            linearMembersQuery.data?.nodes.map((m) => ({
                 label: m.displayName,
                 value: m.id,
             })) ?? []
@@ -107,31 +107,41 @@ const Members: NextPage = () => {
                         <tr key={row.id}>
                             <td>
                                 <Controller
+                                    name={`rows.${index}.githubSearch`}
                                     control={form.control}
-                                    render={({ field }) => (
-                                        <Select
-                                            searchable
-                                            ref={field.ref}
-                                            itemComponent={SelectItem}
-                                            data={githubSelect}
-                                            value={field.value}
-                                            onBlur={field.onBlur}
-                                            onChange={field.onChange}
-                                            searchValue={search}
-                                            onSearchChange={(s) => {
-                                                setSearch(s)
-                                                setDebouncedSearch(s)
-                                            }}
-                                            icon={
-                                                githubMembersQuery.isLoading ? (
-                                                    <Loader size={14} />
-                                                ) : (
-                                                    <IconSearch size={14} />
-                                                )
-                                            }
+                                    render={({ field: searchField }) => (
+                                        <Controller
+                                            name={`rows.${index}.github`}
+                                            control={form.control}
+                                            render={({ field }) => (
+                                                <Select
+                                                    searchable
+                                                    ref={field.ref}
+                                                    itemComponent={SelectItem}
+                                                    data={githubSelect}
+                                                    value={field.value}
+                                                    onBlur={field.onBlur}
+                                                    onChange={field.onChange}
+                                                    searchValue={
+                                                        searchField.value
+                                                    }
+                                                    onSearchChange={(s) => {
+                                                        searchField.onChange(s)
+                                                        setDebouncedSearch(s)
+                                                    }}
+                                                    icon={
+                                                        githubMembersQuery.isLoading ? (
+                                                            <Loader size={14} />
+                                                        ) : (
+                                                            <IconSearch
+                                                                size={14}
+                                                            />
+                                                        )
+                                                    }
+                                                />
+                                            )}
                                         />
                                     )}
-                                    name={`rows.${index}.github`}
                                 />
                             </td>
                             <td>
