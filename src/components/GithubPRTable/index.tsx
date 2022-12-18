@@ -10,7 +10,9 @@ import flow from 'lodash/fp/flow'
 import flatMap from 'lodash/fp/flatMap'
 import orderBy from 'lodash/fp/orderBy'
 
-type Props = {}
+type Props = {
+    githubId: string
+}
 const GithubPRTable: React.FC<Props> = (props) => {
     const octokit = React.useContext(OctokitContext)
 
@@ -23,6 +25,7 @@ const GithubPRTable: React.FC<Props> = (props) => {
         <TableRepositories
             octokit={octokit}
             connection={connectionQuery.data}
+            githubId={props.githubId}
         />
     )
 }
@@ -30,16 +33,17 @@ const GithubPRTable: React.FC<Props> = (props) => {
 const TableRepositories: React.FC<{
     octokit: Octokit
     connection: GetConnectionResponse
+    githubId: string
 }> = (props) => {
     const repoQueries = useQueries(
         props.connection.github.map((repo) => ({
-            queryKey: `pullrequests/${repo.owner}/${repo.repo}`,
+            queryKey: `pullrequests/${repo.owner}/${repo.repo}?author=${props.githubId}`,
             queryFn: () =>
                 props.octokit.request('GET /search/issues', {
                     q: [
                         `repo:${repo.owner}/${repo.repo}`,
                         `is:pr`,
-                        `author:suzu2469`,
+                        `author:${props.githubId}`,
                         `created:2022-12-01..2022-12-31`,
                     ].join(' '),
                 }),

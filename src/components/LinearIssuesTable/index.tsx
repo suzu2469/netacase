@@ -8,7 +8,10 @@ import { LinearContext } from '../../context/linear'
 import { Issue } from '@linear/sdk'
 import { open } from '@tauri-apps/api/shell'
 
-const LinearIssuesTable: React.FC = () => {
+type Props = {
+    linearId: string
+}
+const LinearIssuesTable: React.FC<Props> = () => {
     const linearClient = React.useContext(LinearContext)
     const res = useQuery(
         'linear/issues',
