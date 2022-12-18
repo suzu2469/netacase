@@ -1,10 +1,10 @@
 import * as React from 'react'
 import type { NextPage } from 'next'
 import { invoke } from '@tauri-apps/api/tauri'
-import { Text, Container, Row, Input, Col, Button } from '@nextui-org/react'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 import { useQuery } from 'react-query'
+import { Container, Title, Input, Button, Group, Stack } from '@mantine/core'
 import type { GetTokenResponse } from '../types/GetTokenResponse'
 
 type FormData = {
@@ -48,51 +48,27 @@ const Index: NextPage = () => {
 
     return (
         <form onSubmit={form.handleSubmit(clickSubmit)}>
-            <Container xs>
-                <Row>
-                    <Text h1>Setup</Text>
-                </Row>
-                <Row css={{ mt: '24px' }}>
-                    <Col>
-                        <Text h2 size={24}>
-                            GitHub
-                        </Text>
-                        <Input
-                            {...form.register('github')}
-                            css={{ mt: '16px' }}
-                            width="256px"
-                        />
-                    </Col>
-                </Row>
-                <Row css={{ mt: '24px' }}>
-                    <Col>
-                        <Text h2 size={24}>
-                            Atlassian
-                        </Text>
-                        <Input
-                            {...form.register('atlassian')}
-                            css={{ mt: '16px' }}
-                            width="256px"
-                        />
-                    </Col>
-                </Row>
-                <Row css={{ mt: '24px' }}>
-                    <Col>
-                        <Text h2 size={24}>
-                            Linear
-                        </Text>
-                        <Input
-                            {...form.register('linear')}
-                            css={{ mt: '16px' }}
-                            width="256px"
-                        />
-                    </Col>
-                </Row>
-                <Row css={{ mt: '48px' }}>
-                    <Button size="sm" type="submit">
-                        次へ
-                    </Button>
-                </Row>
+            <Container py="24px">
+                <Title order={1}>Setup</Title>
+                <Stack spacing="lg" mt="24px">
+                    <Stack spacing="xs">
+                        <Title order={2}>Github</Title>
+                        <Input {...form.register('github')} w="256px" />
+                    </Stack>
+                    <Stack spacing="xs">
+                        <Title order={2}>linear</Title>
+                        <Input {...form.register('linear')} w="256px" />
+                    </Stack>
+                    <Stack spacing="xs">
+                        <Title order={2}>Atlassian</Title>
+                        <Input {...form.register('atlassian')} w="256px" />
+                    </Stack>
+                    <Group>
+                        <Button type="submit" w="158px">
+                            次へ
+                        </Button>
+                    </Group>
+                </Stack>
             </Container>
         </form>
     )

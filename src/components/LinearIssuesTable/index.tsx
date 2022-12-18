@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useQuery } from 'react-query'
-import { Table, Badge, Link } from '@nextui-org/react'
+import { Table, Badge, Text } from '@mantine/core'
 import parse from 'date-fns/fp/parse'
 import orderBy from 'lodash/fp/orderBy'
 
@@ -8,7 +8,10 @@ import { LinearContext } from '../../context/linear'
 import { Issue } from '@linear/sdk'
 import { open } from '@tauri-apps/api/shell'
 
-const LinearIssuesTable: React.FC = () => {
+type Props = {
+    linearId: string
+}
+const LinearIssuesTable: React.FC<Props> = () => {
     const linearClient = React.useContext(LinearContext)
     const res = useQuery(
         'linear/issues',
@@ -86,30 +89,38 @@ const LinearIssuesTable: React.FC = () => {
 
     if (res.isLoading || !res.data) return <div>Loading...</div>
     return (
-        <Table containerCss={{ minWidth: '100%' }}>
-            <Table.Header>
-                <Table.Column>ID</Table.Column>
-                <Table.Column>Issue</Table.Column>
-                <Table.Column>Status</Table.Column>
-            </Table.Header>
-            <Table.Body>
+        <Table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Issue</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
                 {issues.map((issue) => (
-                    <Table.Row key={issue.id}>
-                        <Table.Cell>
-                            <Link onClick={() => open(issue.url)}>
+                    <tr key={issue.id}>
+                        <td>
+                            <Text
+                                style={{
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline',
+                                }}
+                                onClick={() => open(issue.url)}
+                            >
                                 {issue.identifier}
-                            </Link>
-                        </Table.Cell>
-                        <Table.Cell>{issue.title}</Table.Cell>
-                        <Table.Cell>
+                            </Text>
+                        </td>
+                        <td>{issue.title}</td>
+                        <td>
                             <StatusBadge
                                 completedAt={issue.completedAt}
                                 startedAt={issue.startedAt}
                             />
-                        </Table.Cell>
-                    </Table.Row>
+                        </td>
+                    </tr>
                 ))}
-            </Table.Body>
+            </tbody>
         </Table>
     )
 }
@@ -121,9 +132,9 @@ type StatusCondition = {
 const StatusBadge = <T extends StatusCondition>(
     issue: T,
 ): React.ReactElement => {
-    if (issue.completedAt) return <Badge color="secondary">Done</Badge>
-    if (issue.startedAt) return <Badge color="warning">In Progress</Badge>
-    return <Badge color="default">Backlog</Badge>
+    if (issue.completedAt) return <Badge color="violet">Done</Badge>
+    if (issue.startedAt) return <Badge>In Progress</Badge>
+    return <Badge color="gray">Backlog</Badge>
 }
 
 export default LinearIssuesTable
