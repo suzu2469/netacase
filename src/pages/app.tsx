@@ -66,11 +66,11 @@ const App: NextPage = () => {
                 data={memberSelectItems}
             />
             <div style={{ marginTop: '24px' }}>
-                {getMembersQuery.isLoading ||
-                formMemberId === null ||
-                !memberData() ? (
+                {getMembersQuery.isLoading ? (
                     <Loader />
-                ) : getMembersQuery.data.members.length <= 0 ? (
+                ) : !memberData() ||
+                  formMemberId === null ||
+                  getMembersQuery.data.members.length <= 0 ? (
                     <Text>
                         <NextLink href="/members">Members</NextLink>{' '}
                         からメンバーを追加してください
