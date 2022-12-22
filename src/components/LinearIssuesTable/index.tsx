@@ -1,7 +1,8 @@
+import 'dayjs/locale/ja'
 import * as React from 'react'
 import { useQuery } from 'react-query'
 import { Table, Badge, Text } from '@mantine/core'
-import parse from 'date-fns/fp/parse'
+import dayjs from 'dayjs'
 import orderBy from 'lodash/fp/orderBy'
 
 import { LinearContext } from '../../context/linear'
@@ -10,11 +11,16 @@ import { open } from '@tauri-apps/api/shell'
 
 type Props = {
     linearId: string
+    startDate: Date | null
+    endDate: Date | null
 }
 const LinearIssuesTable: React.FC<Props> = (props) => {
     const linearClient = React.useContext(LinearContext)
+    const startDate = dayjs(props.startDate).format('YYYY-MM-DD')
+    const endDate = dayjs(props.endDate).format('YYYY-MM-DD')
+
     const res = useQuery(
-        `linear/issues?assignee=${props.linearId}`,
+        `linear/issues?assignee=${props.linearId}&start${startDate}&end=${endDate}`,
         () =>
             linearClient?.issues({
                 filter: {
@@ -30,16 +36,12 @@ const LinearIssuesTable: React.FC<Props> = (props) => {
                                 },
                                 {
                                     startedAt: {
-                                        gte: parse(new Date())('yyyy-MM-dd')(
-                                            '2022-12-01',
-                                        ),
+                                        gte: props.startDate,
                                     },
                                 },
                                 {
                                     startedAt: {
-                                        lte: parse(new Date())('yyyy-MM-dd')(
-                                            '2022-12-31',
-                                        ),
+                                        lte: props.endDate,
                                     },
                                 },
                             ],
@@ -55,16 +57,12 @@ const LinearIssuesTable: React.FC<Props> = (props) => {
                                 },
                                 {
                                     createdAt: {
-                                        gte: parse(new Date())('yyyy-MM-dd')(
-                                            '2022-12-01',
-                                        ),
+                                        gte: props.startDate,
                                     },
                                 },
                                 {
                                     createdAt: {
-                                        lte: parse(new Date())('yyyy-MM-dd')(
-                                            '2022-12-31',
-                                        ),
+                                        lte: props.endDate,
                                     },
                                 },
                             ],
@@ -72,7 +70,7 @@ const LinearIssuesTable: React.FC<Props> = (props) => {
                     ],
                 },
             }),
-        { enabled: !!linearClient },
+        { enabled: !!linearClient && !!props.startDate && !!props.endDate },
     )
 
     const issues = React.useMemo<Issue[]>(() => {
