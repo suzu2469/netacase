@@ -276,6 +276,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hookform/resolvers@npm:^2.9.10":
+  version: 2.9.10
+  resolution: "@hookform/resolvers@npm:2.9.10"
+  peerDependencies:
+    react-hook-form: ^7.0.0
+  checksum: ae3395372d6ff11506a72bb6b3c57046bd14b457c2fe1f0485f60cf2dba0ef4484e3a2fb5a0f6a217f6d701393ebc3683a2ede7c81c6f13e71f965f520c7af16
+  languageName: node
+  linkType: hard
+
 "@linear/sdk@npm:^1.22.0":
   version: 1.22.0
   resolution: "@linear/sdk@npm:1.22.0"
@@ -1861,6 +1870,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.10.5
     "@emotion/server": ^11.10.0
+    "@hookform/resolvers": ^2.9.10
     "@linear/sdk": ^1.22.0
     "@mantine/core": ^5.9.4
     "@mantine/hooks": ^5.9.4
@@ -1881,6 +1891,7 @@ __metadata:
     react-hook-form: ^7.40.0
     react-query: ^3.39.2
     typescript: ^4.7.4
+    zod: ^3.20.2
   languageName: unknown
   linkType: soft
 
@@ -2553,5 +2564,12 @@ __metadata:
   version: 1.10.2
   resolution: "yaml@npm:1.10.2"
   checksum: ce4ada136e8a78a0b08dc10b4b900936912d15de59905b2bf415b4d33c63df1d555d23acb2a41b23cf9fb5da41c256441afca3d6509de7247daa062fd2c5ea5f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.20.2":
+  version: 3.20.2
+  resolution: "zod@npm:3.20.2"
+  checksum: 04172f7e9350372684ccd298d4716908edc9113751295b6c4e1b3ea84e2af8997e504b33ba36f4741417bb2a5dc90bfd40501f6b0e7389df10e42a63d6d8366c
   languageName: node
   linkType: hard

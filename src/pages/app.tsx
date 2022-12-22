@@ -58,6 +58,7 @@ const App: NextPage = () => {
             <Group>
                 <NextLink href="/">Settings</NextLink>
                 <NextLink href="/members">Members</NextLink>
+                <NextLink href="/connections">Connections</NextLink>
             </Group>
             <Select
                 mt="48px"
@@ -65,7 +66,7 @@ const App: NextPage = () => {
                 value={formMemberId}
                 data={memberSelectItems}
             />
-            <div style={{ marginTop: '24px' }}>
+            <div style={{ marginTop: '24px', paddingBottom: '48px' }}>
                 {getMembersQuery.isLoading ? (
                     <Loader />
                 ) : !memberData() ||

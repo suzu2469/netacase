@@ -11,10 +11,10 @@ import { open } from '@tauri-apps/api/shell'
 type Props = {
     linearId: string
 }
-const LinearIssuesTable: React.FC<Props> = () => {
+const LinearIssuesTable: React.FC<Props> = (props) => {
     const linearClient = React.useContext(LinearContext)
     const res = useQuery(
-        'linear/issues',
+        `linear/issues?assignee=${props.linearId}`,
         () =>
             linearClient?.issues({
                 filter: {
@@ -23,8 +23,8 @@ const LinearIssuesTable: React.FC<Props> = () => {
                             and: [
                                 {
                                     assignee: {
-                                        displayName: {
-                                            contains: 'soumasuzuki',
+                                        id: {
+                                            eq: props.linearId,
                                         },
                                     },
                                 },
@@ -48,8 +48,8 @@ const LinearIssuesTable: React.FC<Props> = () => {
                             and: [
                                 {
                                     assignee: {
-                                        displayName: {
-                                            contains: 'soumasuzuki',
+                                        id: {
+                                            eq: props.linearId,
                                         },
                                     },
                                 },
@@ -92,7 +92,7 @@ const LinearIssuesTable: React.FC<Props> = () => {
         <Table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style={{ minWidth: '96px' }}>ID</th>
                     <th>Issue</th>
                     <th>Status</th>
                 </tr>
