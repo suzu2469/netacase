@@ -14,7 +14,9 @@ export const LinearProvider: React.FC<React.PropsWithChildren> = (props) => {
 
     React.useEffect(() => {
         if (isLoading) return
-        setClient(new LinearClient({ apiKey: token?.linear ?? '' }))
+        if (!token) return
+        if (token.linear === '') return
+        setClient(new LinearClient({ apiKey: token.linear }))
     }, [token, isLoading])
 
     return (
