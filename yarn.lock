@@ -276,6 +276,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hookform/resolvers@npm:^2.9.10":
+  version: 2.9.10
+  resolution: "@hookform/resolvers@npm:2.9.10"
+  peerDependencies:
+    react-hook-form: ^7.0.0
+  checksum: ae3395372d6ff11506a72bb6b3c57046bd14b457c2fe1f0485f60cf2dba0ef4484e3a2fb5a0f6a217f6d701393ebc3683a2ede7c81c6f13e71f965f520c7af16
+  languageName: node
+  linkType: hard
+
 "@linear/sdk@npm:^1.22.0":
   version: 1.22.0
   resolution: "@linear/sdk@npm:1.22.0"
@@ -301,6 +310,20 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: 33f73b15d0feac5fa9bbd22edcd6c24e8f96d76a5a3183768a559fb7e82b97821684d3f420c2fc65e03f111201034786c542f9c0feee3c224f90ce2347513df9
+  languageName: node
+  linkType: hard
+
+"@mantine/dates@npm:^5.9.5":
+  version: 5.9.5
+  resolution: "@mantine/dates@npm:5.9.5"
+  dependencies:
+    "@mantine/utils": 5.9.5
+  peerDependencies:
+    "@mantine/core": 5.9.5
+    "@mantine/hooks": 5.9.5
+    dayjs: ">=1.0.0"
+    react: ">=16.8.0"
+  checksum: 3798ef6f330aaad5107374c9fc717c8b252dc62cb526c0735372f8206ec6e98f9982bc35148107c78a284753a5c8e28f84735578fbf9d95cdb83b20a69041414
   languageName: node
   linkType: hard
 
@@ -362,6 +385,15 @@ __metadata:
   peerDependencies:
     react: ">=16.8.0"
   checksum: a7fef567c475117424bb36b66537aa4e7a3710c5d6711aaf9a2095a45b15a615e2ac8c5f9896c1eb3af86e401117f89d5fb104e9c428f0ab379d438293365085
+  languageName: node
+  linkType: hard
+
+"@mantine/utils@npm:5.9.5":
+  version: 5.9.5
+  resolution: "@mantine/utils@npm:5.9.5"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 12a4874b2319f418a5bf0287e2af33e7bcd0f8a3e8afce4f48d387f60bc0e1431423e402c821bfbf14462d7d7dd7f631c4ea70be1ca0737fbd85b98640b49288
   languageName: node
   linkType: hard
 
@@ -1032,6 +1064,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4.14.191":
+  version: 4.14.191
+  resolution: "@types/lodash@npm:4.14.191"
+  checksum: ba0d5434e10690869f32d5ea49095250157cae502f10d57de0a723fd72229ce6c6a4979576f0f13e0aa9fbe3ce2457bfb9fa7d4ec3d6daba56730a51906d1491
+  languageName: node
+  linkType: hard
+
 "@types/lru-cache@npm:^5.1.0":
   version: 5.1.1
   resolution: "@types/lru-cache@npm:5.1.1"
@@ -1317,10 +1356,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^2.29.3":
-  version: 2.29.3
-  resolution: "date-fns@npm:2.29.3"
-  checksum: e01cf5b62af04e05dfff921bb9c9933310ed0e1ae9a81eb8653452e64dc841acf7f6e01e1a5ae5644d0337e9a7f936175fd2cb6819dc122fdd9c5e86c56be484
+"dayjs@npm:^1.11.7":
+  version: 1.11.7
+  resolution: "dayjs@npm:1.11.7"
+  checksum: 5003a7c1dd9ed51385beb658231c3548700b82d3548c0cfbe549d85f2d08e90e972510282b7506941452c58d32136d6362f009c77ca55381a09c704e9f177ebb
   languageName: node
   linkType: hard
 
@@ -1861,17 +1900,20 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.10.5
     "@emotion/server": ^11.10.0
+    "@hookform/resolvers": ^2.9.10
     "@linear/sdk": ^1.22.0
     "@mantine/core": ^5.9.4
+    "@mantine/dates": ^5.9.5
     "@mantine/hooks": ^5.9.4
     "@mantine/next": ^5.9.4
     "@tabler/icons": ^1.117.0
     "@tauri-apps/api": ^1.1.0
     "@tauri-apps/cli": ^1.1.0
+    "@types/lodash": ^4.14.191
     "@types/node": ^18.7.11
     "@types/react": ^18.0.17
     "@types/react-dom": ^18.0.6
-    date-fns: ^2.29.3
+    dayjs: ^1.11.7
     lodash: ^4.17.21
     next: ^12.2.5
     octokit: ^2.0.10
@@ -1881,6 +1923,7 @@ __metadata:
     react-hook-form: ^7.40.0
     react-query: ^3.39.2
     typescript: ^4.7.4
+    zod: ^3.20.2
   languageName: unknown
   linkType: soft
 
@@ -2553,5 +2596,12 @@ __metadata:
   version: 1.10.2
   resolution: "yaml@npm:1.10.2"
   checksum: ce4ada136e8a78a0b08dc10b4b900936912d15de59905b2bf415b4d33c63df1d555d23acb2a41b23cf9fb5da41c256441afca3d6509de7247daa062fd2c5ea5f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.20.2":
+  version: 3.20.2
+  resolution: "zod@npm:3.20.2"
+  checksum: 04172f7e9350372684ccd298d4716908edc9113751295b6c4e1b3ea84e2af8997e504b33ba36f4741417bb2a5dc90bfd40501f6b0e7389df10e42a63d6d8366c
   languageName: node
   linkType: hard

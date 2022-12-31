@@ -3,7 +3,7 @@ import type { NextPage } from 'next'
 import { invoke } from '@tauri-apps/api/tauri'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Container, Title, Input, Button, Group, Stack } from '@mantine/core'
 import type { GetTokenResponse } from '../types/GetTokenResponse'
 
@@ -14,8 +14,18 @@ type FormData = {
 }
 
 const Index: NextPage = () => {
+    const queryClient = useQueryClient()
     const router = useRouter()
     const query = useQuery('token', () => invoke<GetTokenResponse>('get_token'))
+    const mutation = useMutation(
+        'set_token',
+        (values: FormData) => invoke('set_token', { token: values }),
+        {
+            onSettled: (_, context) => {
+                queryClient.resetQueries('token')
+            },
+        },
+    )
 
     const form = useForm<FormData>({
         defaultValues: {
@@ -27,13 +37,8 @@ const Index: NextPage = () => {
 
     const clickSubmit = React.useCallback(
         (data: FormData) => {
-            invoke('set_token', {
-                token: {
-                    github: data.github,
-                    atlassian: data.atlassian,
-                    linear: data.linear,
-                },
-            })
+            mutation
+                .mutateAsync(data)
                 .then(() => {
                     router.push('/app')
                 })

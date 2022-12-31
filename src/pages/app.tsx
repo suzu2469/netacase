@@ -13,12 +13,19 @@ import {
     Text,
     Title,
 } from '@mantine/core'
+import { DateRangePicker, DateRangePickerValue } from '@mantine/dates'
 import { useQuery } from 'react-query'
 import { invoke } from '@tauri-apps/api/tauri'
 import { GetMembersResponse } from '../types/GetMembersResponse'
-import { Controller, useForm } from 'react-hook-form'
+import dayjs from 'dayjs'
+import 'dayjs/locale/ja'
 
 const App: NextPage = () => {
+    const [datePickerValue, setDatePickerValue] =
+        React.useState<DateRangePickerValue>([
+            dayjs().date(1).toDate(),
+            dayjs().date(31).toDate(),
+        ])
     const [formMemberId, setFormMemberId] = React.useState(null)
 
     const getMembersQuery = useQuery('members', () =>
@@ -58,19 +65,27 @@ const App: NextPage = () => {
             <Group>
                 <NextLink href="/">Settings</NextLink>
                 <NextLink href="/members">Members</NextLink>
+                <NextLink href="/connections">Connections</NextLink>
             </Group>
-            <Select
-                mt="48px"
-                onChange={setFormMemberId}
-                value={formMemberId}
-                data={memberSelectItems}
-            />
-            <div style={{ marginTop: '24px' }}>
-                {getMembersQuery.isLoading ||
-                formMemberId === null ||
-                !memberData() ? (
+            <Group mt="48px">
+                <Select
+                    label="メンバー"
+                    onChange={setFormMemberId}
+                    value={formMemberId}
+                    data={memberSelectItems}
+                />
+                <DateRangePicker
+                    label="期間"
+                    value={datePickerValue}
+                    onChange={setDatePickerValue}
+                />
+            </Group>
+            <div style={{ marginTop: '24px', paddingBottom: '48px' }}>
+                {getMembersQuery.isLoading ? (
                     <Loader />
-                ) : getMembersQuery.data.members.length <= 0 ? (
+                ) : !memberData() ||
+                  formMemberId === null ||
+                  getMembersQuery.data.members.length <= 0 ? (
                     <Text>
                         <NextLink href="/members">Members</NextLink>{' '}
                         からメンバーを追加してください
@@ -79,6 +94,8 @@ const App: NextPage = () => {
                     <MainContent
                         githubId={memberData()?.githubId ?? ''}
                         linearId={memberData()?.linearId ?? ''}
+                        startDate={datePickerValue[0]}
+                        endDate={datePickerValue[1]}
                     />
                 )}
             </div>
@@ -89,6 +106,8 @@ const App: NextPage = () => {
 type MainContentProps = {
     githubId: string
     linearId: string
+    startDate: Date
+    endDate: Date
 }
 const MainContent: React.FC<MainContentProps> = (props) => {
     return (
@@ -98,11 +117,19 @@ const MainContent: React.FC<MainContentProps> = (props) => {
                 <Title order={3} mt="8px">
                     Pull Requests
                 </Title>
-                <GithubPRTable githubId={props.githubId} />
+                <GithubPRTable
+                    startDate={props.startDate}
+                    endDate={props.endDate}
+                    githubId={props.githubId}
+                />
             </div>
             <div>
                 <Title order={2}>Linear</Title>
-                <LinearIssuesTable linearId={props.linearId} />
+                <LinearIssuesTable
+                    startDate={props.startDate}
+                    endDate={props.endDate}
+                    linearId={props.linearId}
+                />
             </div>
             {/*<div>*/}
             {/*    <Title order={2}>Atlassian</Title>*/}

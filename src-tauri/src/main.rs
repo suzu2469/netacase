@@ -75,6 +75,13 @@ fn get_connection() -> Result<Connection, String> {
     serde_json::from_slice(&connection_json).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn set_connection(connection: Connection) -> Result<(), String> {
+    let connection_string  = serde_json::to_string(&connection).map_err(|e| e.to_string())?;
+    fs::write(CONNECTION_FILE, connection_string).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 const MEMBERS_FILE: &str = "../.config/members.json";
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -114,7 +121,7 @@ fn set_members(member_setting: MemberSetting) -> Result<(), String> {
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, set_token, get_token, get_connection, get_members, set_members])
+        .invoke_handler(tauri::generate_handler![greet, set_token, get_token, get_connection, set_connection, get_members, set_members])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
